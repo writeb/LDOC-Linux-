@@ -1,0 +1,5 @@
+# Проверка контейнера каждые 10 минут
+*/10 * * * * /usr/local/bin/check_container.sh
+
+# Очистка логов ежедневно в 4 утра
+0 4 * * * /usr/local/bin/cleanup_logs.sh
