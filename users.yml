@@ -1,0 +1,24 @@
+---
+- name: Create user groups
+  group:
+    name: "{{ item }}"
+  loop:
+    - admins
+    - postgres
+    - backend_user
+    - frontend_user
+    - teacher_user
+    - student_user
+
+- name: Create users
+  user:
+    name: "{{ item.name }}"
+    groups: "{{ item.group }}"
+    shell: /bin/bash
+  loop:
+    - { name: 'admin1', group: 'admins' }
+    - { name: 'postgres1', group: 'postgres' }
+    - { name: 'backend1', group: 'backend_user' }
+    - { name: 'frontend1', group: 'frontend_user' }
+    - { name: 'teacher1', group: 'teacher_user' }
+    - { name: 'student1', group: 'student_user' }

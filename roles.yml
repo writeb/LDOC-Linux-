@@ -1,0 +1,28 @@
+---
+- name: Install nginx service
+  copy:
+    dest: /etc/systemd/system/custom-nginx.service
+    content: |
+      [Unit]
+      Description=Custom Nginx Docker Container
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      ExecStartPre=/usr/bin/docker stop custom-nginx || true
+      ExecStartPre=/usr/bin/docker rm custom-nginx || true
+      ExecStart=/usr/bin/docker run --name custom-nginx -p 80:80 custom-nginx:1.0
+      ExecStop=/usr/bin/docker stop custom-nginx
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: Start nginx service
+  service:
+    name: custom-nginx
+    enabled: yes
+    state: started

@@ -1,0 +1,30 @@
+---
+- name: Create check_container.sh
+  copy:
+    dest: /usr/local/bin/check_container.sh
+    mode: '0755'
+    content: |
+      #!/bin/bash
+      if ! docker ps | grep -q custom-nginx; then
+        systemctl restart custom-nginx
+      fi
+
+- name: Create cleanup_logs.sh
+  copy:
+    dest: /usr/local/bin/cleanup_logs.sh
+    mode: '0755'
+    content: |
+      #!/bin/bash
+      find /var/log -type f -mtime +5 -exec rm -f {} \;
+
+- name: Add cron for check_container
+  cron:
+    name: "Check container"
+    job: "/usr/local/bin/check_container.sh"
+
+- name: Add cron for cleanup_logs
+  cron:
+    name: "Cleanup logs"
+    job: "/usr/local/bin/cleanup_logs.sh"
+    minute: "0"
+    hour: "0"

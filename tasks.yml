@@ -1,0 +1,49 @@
+---
+- name: Install apt deps
+  apt:
+    update_cache: yes
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+
+- name: Add Docker GPG
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add repo
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable"
+
+- name: Install docker
+  apt:
+    name: docker-ce
+    state: present
+    update_cache: yes
+
+- name: Ensure docker is running
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Prepare nginx folder
+  file:
+    path: /opt/custom-nginx
+    state: directory
+
+- name: Create index.html
+  copy:
+    dest: /opt/custom-nginx/index.html
+    content: "<h1>Hello from Ansible</h1>"
+
+- name: Copy Dockerfile
+  copy:
+    dest: /opt/custom-nginx/Dockerfile
+    content: |
+      FROM nginx
+      COPY index.html /usr/share/nginx/html/
+
+- name: Build image
+  command: docker build -t custom-nginx:1.0 /opt/custom-nginx

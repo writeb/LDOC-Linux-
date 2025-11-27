@@ -1,0 +1,11 @@
+---
+- name: SIS5
+  hosts: all
+  become: true
+
+  roles:
+    - users
+    - permissions
+    - docker
+    - services
+    - cronjobs

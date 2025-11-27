@@ -1,17 +1,19 @@
 [Unit]
 Description=Custom Nginx Docker Container
-After=network.target docker.service
+After=docker.service
 Requires=docker.service
 
 [Service]
-ExecStartPre=-/usr/bin/docker stop custom-nginx
-ExecStartPre=-/usr/bin/docker rm custom-nginx
-ExecStartPre=/usr/bin/docker pull writeb432/custom-nginx:1.0
-ExecStart=/usr/bin/docker run --name custom-nginx -p 80:80 writeb432/custom-nginx:1.0
-ExecStop=/usr/bin/docker stop custom-nginx
-
 Restart=always
 RestartSec=5
+
+ExecStartPre=/usr/bin/docker rm -f custom-nginx || true
+ExecStart=/usr/bin/docker run \
+    --name custom-nginx \
+    -p 80:80 \
+    custom-nginx:1.0
+
+ExecStop=/usr/bin/docker stop custom-nginx
 
 [Install]
 WantedBy=multi-user.target
