@@ -1,0 +1,11 @@
+---
+- name: Install journal tools
+  copy:
+    src: "{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    mode: '0755'
+  loop:
+    - journal-errors-today.sh
+    - journal-unit.sh
+    - journal-grep.sh
+    - journal-follow-ssh.sh

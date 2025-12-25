@@ -1,0 +1,32 @@
+---
+- name: Ensure journald persistent directory exists
+  file:
+    path: /var/log/journal
+    state: directory
+    owner: root
+    group: systemd-journal
+    mode: '2755'
+
+- name: Deploy journald.conf
+  template:
+    src: journald.conf.j2
+    dest: /etc/systemd/journald.conf
+  notify: Restart journald
+
+- name: Create drop-in directory for SMS services
+  file:
+    path: "/etc/systemd/system/{{ item }}.d"
+    state: directory
+  loop: "{{ sms_services }}"
+
+- name: Apply logging config (stdout → journald)
+  copy:
+    dest: "/etc/systemd/system/{{ item }}.d/logging.conf"
+    content: |
+      [Service]
+      StandardOutput=journal
+      StandardError=journal
+  loop: "{{ sms_services }}"
+  notify:
+    - Reload systemd
+    - Restart SMS services

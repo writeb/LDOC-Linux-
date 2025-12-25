@@ -1,0 +1,45 @@
+---
+- name: Configure sudoers for admins
+  copy:
+    dest: /etc/sudoers.d/admins
+    content: "%admins ALL=(ALL) ALL"
+    mode: '0440'
+
+- name: Add SSH key for admin1
+  authorized_key:
+    user: admin1
+    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+    state: present
+
+- name: Create backend directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: backend_user
+    group: backend
+    mode: '0750'
+  loop:
+    - /etc/student-monitoring
+    - /var/tmp/student-monitoring
+  when: inventory_hostname in ['backend-vm']
+
+- name: Create frontend static directory
+  file:
+    path: /var/www/student-monitor
+    state: directory
+    owner: frontend_user
+    group: frontend
+    mode: '0750'
+  when: inventory_hostname in ['frontend-vm']
+
+- name: Create postgres directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: '0700'
+  loop:
+    - /var/lib/postgresql
+    - /etc/postgresql
+  when: inventory_hostname in ['db-vm']

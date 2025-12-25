@@ -1,0 +1,14 @@
+---
+- name: Restart journald
+  service:
+    name: systemd-journald
+    state: restarted
+
+- name: Reload systemd
+  command: systemctl daemon-reload
+
+- name: Restart SMS services
+  service:
+    name: "{{ item }}"
+    state: restarted
+  loop: "{{ sms_services }}"

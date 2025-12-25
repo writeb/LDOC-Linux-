@@ -1,0 +1,19 @@
+---
+- name: SIS6
+  hosts: all
+  become: yes
+
+  vars:
+    journald_storage: persistent
+    journald_system_max_use: 500M
+    journald_system_max_file_size: 50M
+
+    sms_services:
+      - backend-sms.service
+      - frontend-sms.service
+      - db-sms.service
+
+  roles:
+    - journald
+    - journal_tools
+    - audit

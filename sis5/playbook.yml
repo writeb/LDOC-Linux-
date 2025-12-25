@@ -1,0 +1,24 @@
+---
+- name: Configure users and groups
+  hosts: all
+  become: true
+  roles:
+    - users
+
+- name: Configure permissions and sudo/SSH
+  hosts: all
+  become: true
+  roles:
+    - permissions
+
+- name: Docker, Nginx container on frontend-vm
+  hosts: frontend
+  become: true
+  roles:
+    - docker_nginx
+
+- name: Setup cron
+  hosts: frontend
+  become: true
+  roles:
+    - cron

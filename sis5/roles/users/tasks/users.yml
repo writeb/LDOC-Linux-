@@ -1,0 +1,28 @@
+---
+- name: Ensure groups exist
+  group:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - admins
+    - backend
+    - frontend
+    - postgres
+    - teachers
+    - students
+
+- name: Ensure users exist
+  user:
+    name: "{{ item.name }}"
+    group: "{{ item.group }}"
+    shell: /bin/bash
+    create_home: yes
+    state: present
+  loop:
+    - { name: "admin1",        group: "admins" }
+    - { name: "backend_user",  group: "backend" }
+    - { name: "frontend_user", group: "frontend" }
+    - { name: "postgres",      group: "postgres" }
+    - { name: "teacher1",      group: "teachers" }
+    - { name: "student1",      group: "students" }
+

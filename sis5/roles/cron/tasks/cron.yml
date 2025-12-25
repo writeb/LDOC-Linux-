@@ -1,0 +1,37 @@
+---
+- name: Create check_container.sh
+  copy:
+    dest: /usr/local/bin/check_container.sh
+    mode: '0755'
+    content: |
+      #!/bin/bash
+      if ! docker ps | grep -q custom-nginx; then
+        echo "$(date): custom-nginx is down, restarting service..." >> /var/log/container_check.log
+        systemctl restart custom-nginx
+      else
+        echo "$(date): custom-nginx is running fine." >> /var/log/container_check.log
+      fi
+
+- name: Create cleanup_logs.sh
+  copy:
+    dest: /usr/local/bin/cleanup_logs.sh
+    mode: '0755'
+    content: |
+      #!/bin/bash
+      find /var/log -type f -name "*.log" -mtime +7 -print -delete
+      echo "$(date): Old logs cleaned." >> /var/log/log_cleanup.log
+
+- name: Setup cron job for container check
+  cron:
+    name: "Check custom-nginx container"
+    job: "/usr/local/bin/check_container.sh"
+    minute: "*/10"
+    user: root
+
+- name: Setup cron job for log cleanup
+  cron:
+    name: "Cleanup logs"
+    job: "/usr/local/bin/cleanup_logs.sh"
+    minute: "0"
+    hour: "10"
+    user: root
